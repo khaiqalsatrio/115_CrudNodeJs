@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../Database/db'); // Mengimpor koneksi database
+const db = require('../database/db'); // Mengimpor koneksi database
 
 // Endpoint untuk mendapatkan semua tugas
 router.get('/', (req, res) => {
@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
         if (err) return res.status(500).send('Internal Server Error');
         res.json(results);
     });
-}); 
+});
 
 // Endpoint untuk mendapatkan tugas berdasarkan ID
 router.get('/:id', (req, res) => {
