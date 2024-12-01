@@ -1,3 +1,19 @@
+<head>
+    <style>
+        /* Hover effect for the card */
+        .card:hover {
+            z-index: 999;  /* Menjadikan card yang di-hover muncul di atas */
+            transform: scale(1.05); /* Sedikit memperbesar card saat di-hover */
+            transition: transform 0.3s ease, z-index 0s; /* Efek transisi halus */
+        }
+
+        /* Untuk transisi halus saat card muncul di atas */
+        .card {
+            transition: transform 0.3s ease, z-index 0s;
+        }
+    </style>
+</head>
+
 <div class="container mt-5">
     <h1 class="text-center">Todo List</h1>
 
@@ -11,20 +27,27 @@
         </div>
     </form>
 
-    <!-- List of Todos -->
-    <ul id="todoList" class="list-group">
-        <% todos.forEach(todo=> { %>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="<%= todo.completed ? 'completed' : '' %>">
-                    <%= todo.task %>
-                </span>
-                <div>
-                    <button class="btn btn-sm btn-success mr-2 editBtn" data-id="<%= todo.id %>">Edit</button>
-                    <button class="btn btn-sm btn-danger deleteBtn" data-id="<%= todo.id %>">Delete</button>
+    <!-- List of Todos in Cards -->
+    <div id="todoList" class="row">
+        <% todos.forEach(todo => { %>
+            <div class="col-md-4 mb-4">
+                <div class="card d-flex flex-column justify-content-center text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= todo.task %></h5>
+                        <p class="card-text">
+                            <span class="<%= todo.completed ? 'completed' : '' %>">
+                                <%= todo.completed ? 'Completed' : 'Not Completed' %>
+                            </span>
+                        </p>
+                        <div>
+                            <button class="btn btn-sm btn-success mr-2 editBtn" data-id="<%= todo.id %>">Edit</button>
+                            <button class="btn btn-sm btn-danger deleteBtn" data-id="<%= todo.id %>">Delete</button>
+                        </div>
+                    </div>
                 </div>
-            </li>
-            <% }); %>
-    </ul>
+            </div>
+        <% }); %>
+    </div>
 
     <!-- Edit Todo Modal -->
     <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -46,11 +69,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmDeleteModal" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Penghapusan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus data ini?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
+        let deleteId;  // Menyimpan ID todo yang akan dihapus
+
         // Add new todo
         $('#addTodoForm').on('submit', function (e) {
             e.preventDefault();
@@ -62,7 +106,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ task: task }),
                     success: function (newTodo) {
-                        location.reload(); // Reload to show the new todo
+                        location.reload(); // Reload untuk menampilkan todo baru
                     },
                     error: function (error) {
                         console.error("Error adding task:", error.responseText);
@@ -71,16 +115,25 @@
             }
         });
 
-        // Delete a todo
+        // Show confirmation modal when delete button is clicked
         $('.deleteBtn').on('click', function () {
-            const id = $(this).data('id');
+            deleteId = $(this).data('id');  // Mendapatkan ID tugas yang akan dihapus
+            $('#confirmDeleteModal').modal('show');  // Menampilkan modal konfirmasi
+        });
+
+        // Handle confirm delete action
+        $('#confirmDeleteBtn').on('click', function () {
             $.ajax({
-                url: '/todos/' + id,
+                url: '/todos/' + deleteId,
                 type: 'DELETE',
                 success: function () {
-                    location.reload(); // Reload to show updated list
+                    location.reload(); // Reload untuk menampilkan daftar todo terbaru
+                },
+                error: function (error) {
+                    console.error("Error deleting task:", error.responseText);
                 }
             });
+            $('#confirmDeleteModal').modal('hide');  // Menutup modal setelah konfirmasi
         });
 
         // Show edit modal with the current task
@@ -103,7 +156,7 @@
                     data: JSON.stringify({ task: task, completed: false }),
                     contentType: 'application/json',
                     success: function () {
-                        location.reload(); // Reload to show the updated todo
+                        location.reload(); // Reload untuk menampilkan todo yang telah diperbarui
                     }
                 });
             }
