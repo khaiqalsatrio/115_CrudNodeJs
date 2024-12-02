@@ -48,6 +48,28 @@ app.get('/contact',isAuthenticated,(req, res) => {
         
 });
 
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/', authRoutes);
+
+app.get('/index',isAuthenticated,(req, res) => {
+    res.render('index', {
+        layout: 'layout/main-layout.ejs'
+    });
+        
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error saat logout:", err);
+            return res.status(500).send("Error saat logout");
+        }
+        res.redirect('/login'); // Arahkan ke halaman login setelah logout
+    });
+});
+
+
 app.get('/todo-view', (req, res) => {
     db.query('SELECT * FROM todos', (err, todos) => {
         if (err) return res.status(500).send('Internal Server Error');
