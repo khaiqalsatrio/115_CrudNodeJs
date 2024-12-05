@@ -1,3 +1,4 @@
+<body style="background-color:bisque;">
 <head>
     <style>
         /* Hover effect for the card */
@@ -6,7 +7,6 @@
             transform: scale(1.05); /* Sedikit memperbesar card saat di-hover */
             transition: transform 0.3s ease, z-index 0s; /* Efek transisi halus */
         }
-
         /* Untuk transisi halus saat card muncul di atas */
         .card {
             transition: transform 0.3s ease, z-index 0s;
@@ -14,7 +14,7 @@
     </style>
 </head>
 
-<div class="container mt-5">
+<div class="container mt-5" style="background-color: silver; border-radius: 25px;">
     <h1 class="text-center">List Data Todo</h1>
 
     <!-- Form to Add New Todo -->
@@ -89,7 +89,7 @@
         </div>
     </div>
 </div>
-
+</body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
